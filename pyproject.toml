@@ -6,6 +6,7 @@ authors = ["jmcguffee <justin.mcguffee@cfpb.gov>"]
 readme = "README.md"
 packages = [{ include = "regtech_cleanup_api", from = "src" }]
 
+
 [tool.poetry.dependencies]
 python = ">=3.12,<4"
 sqlalchemy = "^2.0.31"
@@ -13,6 +14,10 @@ regtech-api-commons = {git = "https://github.com/cfpb/regtech-api-commons.git"}
 sbl-filing-api = {git = "https://github.com/cfpb/sbl-filing-api.git"}
 regtech-user-fi-management = {git = "https://github.com/cfpb/regtech-user-fi-management.git"}
 boto3 = "^1.34.149"
+
+
+[tool.poetry.group.linters.dependencies]
+ruff = "0.5.5"
 
 
 [build-system]
