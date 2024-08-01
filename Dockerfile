@@ -16,6 +16,6 @@ WORKDIR /usr/app/src
 
 EXPOSE 8888
 
-USER SBL
+USER sbl
 
 CMD uvicorn regtech_cleanup_api.main:app --host 0.0.0.0 --port 8888 --log-config log-config.yml --log-level $UVICORN_LOG_LEVEL
