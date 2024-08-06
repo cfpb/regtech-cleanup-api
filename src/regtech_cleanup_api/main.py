@@ -17,7 +17,8 @@ from regtech_api_commons.api.exception_handlers import (
     general_exception_handler,
 )
 
-from regtech_cleanup_api.routers.cleanup import router as cleanup_router
+from regtech_cleanup_api.routers.filing_cleanup import router as filing_router
+from regtech_cleanup_api.routers.user_fi_cleanup import router as user_fi_router
 from regtech_cleanup_api.config import kc_settings
 
 log = logging.getLogger()
@@ -48,4 +49,5 @@ app.add_middleware(
 )
 
 
-app.include_router(cleanup_router, prefix="/v1/cleanup")
+app.include_router(user_fi_router, prefix="/v1/user_fi_cleanup")
+app.include_router(filing_router, prefix="/v1/filing_cleanup")
