@@ -1,0 +1,1 @@
+from regtech_cleanup_api.routers.user_fi_cleanup import delete_institution
