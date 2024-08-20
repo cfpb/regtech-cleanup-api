@@ -1,10 +1,4 @@
 import os
-from urllib import parse
-from typing import Any
-
-from pydantic import field_validator, ValidationInfo
-from pydantic.networks import PostgresDsn
-from pydantic_settings import BaseSettings
 
 from regtech_api_commons.oauth2.config import KeycloakSettings
 from regtech_regex.regex_config import RegexConfigs

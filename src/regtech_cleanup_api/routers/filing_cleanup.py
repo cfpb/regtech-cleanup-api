@@ -10,9 +10,6 @@ from typing import Annotated
 
 from regtech_cleanup_api.entities.engine.engine import get_filing_session
 
-
-from regtech_cleanup_api.entities.repos import filing_repo
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from regtech_api_commons.api.dependencies import verify_user_lei_relation

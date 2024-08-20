@@ -16,7 +16,9 @@ def delete(path: str):
         s3 = boto3.resource("s3")
         s3_objects = s3.meta.client.list_objects(Bucket=bucket, Prefix=path)
         if "Contents" in s3_objects:
-            object_keys = {"Objects": [{"Key": k["Key"]} for k in s3_objects["Contents"]]}
+            object_keys = {
+                "Objects": [{"Key": k["Key"]} for k in s3_objects["Contents"]]
+            }
             s3.meta.client.delete_objects(Bucket=bucket, Delete=object_keys)
         else:
             raise RegTechHttpException(
@@ -24,4 +26,3 @@ def delete(path: str):
                 name="Content Not Available",
                 detail="Associated LEI data is not present for removal",
             )
-
