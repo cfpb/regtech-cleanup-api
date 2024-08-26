@@ -5,13 +5,13 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import NullPool
 from asyncio import current_task
-from regtech_cleanup_api.config import user_fi_settings, filing_settings
+from regtech_cleanup_api.config import institution_settings, filing_settings
 
 user_fi_engine = create_async_engine(
-    str(user_fi_settings.inst_conn),
-    echo=user_fi_settings.db_logging,
+    str(institution_settings.inst_conn),
+    echo=institution_settings.db_logging,
     poolclass=NullPool,
-).execution_options(schema_translate_map={None: user_fi_settings.inst_db_schema})
+).execution_options(schema_translate_map={None: institution_settings.inst_db_schema})
 InstitutionSessionLocal = async_scoped_session(
     async_sessionmaker(user_fi_engine, expire_on_commit=False), current_task
 )

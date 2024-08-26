@@ -16,9 +16,10 @@ from regtech_api_commons.api.exception_handlers import (
     http_exception_handler,
     general_exception_handler,
 )
+import uvicorn
 
 from regtech_cleanup_api.routers.filing_cleanup import router as filing_router
-from regtech_cleanup_api.routers.user_fi_cleanup import router as user_fi_router
+from regtech_cleanup_api.routers.institution_cleanup import router as user_fi_router
 from regtech_cleanup_api.config import kc_settings
 
 log = logging.getLogger()
@@ -49,5 +50,9 @@ app.add_middleware(
 )
 
 
-app.include_router(user_fi_router, prefix="/v1/user_fi_cleanup")
+app.include_router(user_fi_router, prefix="/v1/institution_cleanup")
 app.include_router(filing_router, prefix="/v1/filing_cleanup")
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8888)
