@@ -48,29 +48,29 @@ def delete_institution(request: Request, lei: str):
         )
     else:
         delete_domains = repo.delete_domains_by_lei(request.state.db_session, lei)
-    if not delete_domains:
-        logger.error(f"Domain(s) for LEI {lei} not deleted.")
+        if not delete_domains:
+            logger.error(f"Domain(s) for LEI {lei} not deleted.")
 
-    delete_sbl_type = repo.delete_sbl_type_by_lei(request.state.db_session, lei)
-    if not delete_sbl_type:
-        logger.error(f"sbl type(s) for LEI {lei} not deleted.")
+        delete_sbl_type = repo.delete_sbl_type_by_lei(request.state.db_session, lei)
+        if not delete_sbl_type:
+            logger.error(f"sbl type(s) for LEI {lei} not deleted.")
 
-    res = repo.delete_institution(request.state.db_session, lei)
-    if not res:
-        raise RegTechHttpException(
-            HTTPStatus.NOT_FOUND,
-            name="Institution to be deleted Not Found",
-            detail=f"{lei} not found.",
-        )
-    else:
-        try:
-
-            oauth2_admin.delete_group(lei)
-        except Exception:
+        res = repo.delete_institution(request.state.db_session, lei)
+        if not res:
             raise RegTechHttpException(
                 HTTPStatus.NOT_FOUND,
-                name="Group Not Found",
-                detail=f"The group to be deleted {lei} not found.",
+                name="Institution to be deleted Not Found",
+                detail=f"{lei} not found.",
             )
+        else:
+            try:
 
-    return res
+                oauth2_admin.delete_group(lei)
+            except Exception:
+                raise RegTechHttpException(
+                    HTTPStatus.NOT_FOUND,
+                    name="Group Not Found",
+                    detail=f"The group to be deleted {lei} not found.",
+                )
+
+        return res
