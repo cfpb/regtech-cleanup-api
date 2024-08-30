@@ -1,12 +1,12 @@
 import logging
-from typing import TypeVar
 
 from concurrent.futures import ProcessPoolExecutor
-from fastapi import Depends, Request
+from fastapi import Depends, Request, status
+from fastapi.responses import Response
 from regtech_api_commons.api.router_wrapper import Router
 from regtech_cleanup_api.entities.engine.engine import get_institution_session
 from regtech_cleanup_api.entities.repos import institution_repo as repo
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from regtech_api_commons.api.dependencies import verify_user_lei_relation
 from regtech_user_fi_management.entities.models.dto import (
     FinancialInstitutionWithRelationsDto,
@@ -19,14 +19,10 @@ from regtech_cleanup_api.services.validation import is_valid_cleanup_lei
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar("T")
-
 oauth2_admin = OAuth2Admin(kc_settings)
 
 
-async def set_db(
-    request: Request, session: AsyncSession = Depends(get_institution_session)
-):
+def set_db(request: Request, session: Session = Depends(get_institution_session)):
     request.state.db_session = session
 
 
@@ -34,12 +30,13 @@ executor = ProcessPoolExecutor()
 router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)])
 
 
-@router.get(
+@router.delete(
     "/{lei}",
     response_model=FinancialInstitutionWithRelationsDto,
     dependencies=[Depends(verify_user_lei_relation)],
 )
 def delete_institution(request: Request, lei: str):
+
     if not is_valid_cleanup_lei(lei):
         raise RegTechHttpException(
             HTTPStatus.NOT_ACCEPTABLE,
@@ -47,6 +44,7 @@ def delete_institution(request: Request, lei: str):
             detail=f"{lei} not valid test lei.",
         )
     else:
+
         delete_domains = repo.delete_domains_by_lei(request.state.db_session, lei)
         if not delete_domains:
             logger.error(f"Domain(s) for LEI {lei} not deleted.")
@@ -73,4 +71,7 @@ def delete_institution(request: Request, lei: str):
                     detail=f"The group to be deleted {lei} not found.",
                 )
 
-        return res
+        return Response(
+            content=f"The institution {lei} deleted.",
+            status_code=status.HTTP_204_NO_CONTENT,
+        )
