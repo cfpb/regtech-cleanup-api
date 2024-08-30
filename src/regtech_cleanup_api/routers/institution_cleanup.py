@@ -71,7 +71,4 @@ def delete_institution(request: Request, lei: str):
                     detail=f"The group to be deleted {lei} not found.",
                 )
 
-        return Response(
-            content=f"The institution {lei} deleted.",
-            status_code=status.HTTP_204_NO_CONTENT,
-        )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
