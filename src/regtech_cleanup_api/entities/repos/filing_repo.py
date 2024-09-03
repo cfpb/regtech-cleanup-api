@@ -1,4 +1,3 @@
-import logging
 
 from typing import TypeVar, Any
 from sbl_filing_api.entities.models.dao import (

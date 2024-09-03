@@ -10,7 +10,7 @@ from typing import Annotated
 
 from regtech_cleanup_api.entities.engine.engine import get_filing_session
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from regtech_api_commons.api.dependencies import verify_user_lei_relation
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 async def set_db(
-    request: Request, session: Annotated[AsyncSession, Depends(get_filing_session)]
+    request: Request, session: Annotated[Session, Depends(get_filing_session)]
 ):
     request.state.db_session = session
 
