@@ -36,7 +36,6 @@ router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)
     dependencies=[Depends(verify_user_lei_relation)],
 )
 def delete_institution(request: Request, lei: str):
-
     if not is_valid_cleanup_lei(lei):
         raise RegTechHttpException(
             HTTPStatus.NOT_ACCEPTABLE,
@@ -44,7 +43,6 @@ def delete_institution(request: Request, lei: str):
             detail=f"{lei} not valid test lei.",
         )
     else:
-
         delete_domains = repo.delete_domains_by_lei(request.state.db_session, lei)
         if not delete_domains:
             logger.error(f"Domain(s) for LEI {lei} not deleted.")
@@ -62,7 +60,6 @@ def delete_institution(request: Request, lei: str):
             )
         else:
             try:
-
                 oauth2_admin.delete_group(lei)
             except Exception:
                 raise RegTechHttpException(
