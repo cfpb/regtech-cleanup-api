@@ -14,7 +14,7 @@ def delete(path: str):
         try:
             shutil.rmtree(f"{filing_settings.fs_upload_config.root}/{path}")
         except OSError as e:
-            logging.error("Unable to delete local file or it does not exist. Error:", e)
+            logging.error("Unable to delete local file or it does not exist.", e)
     else:
         bucket = filing_settings.fs_upload_config.root
         s3 = boto3.resource("s3")
