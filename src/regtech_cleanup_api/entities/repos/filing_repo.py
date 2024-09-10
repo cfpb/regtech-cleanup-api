@@ -7,7 +7,6 @@ from sbl_filing_api.entities.models.dao import (
     ContactInfoDAO,
 )
 
-from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
 from regtech_cleanup_api.entities.repos import submission_repo

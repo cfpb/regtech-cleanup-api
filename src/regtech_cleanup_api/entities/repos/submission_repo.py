@@ -1,18 +1,10 @@
 import logging
-
-from sqlalchemy import select
 from typing import List, TypeVar
-
 from copy import deepcopy
+from sbl_filing_api.entities.models.dao import FilingDAO, FilingTaskProgressDAO, FilingTaskDAO, SubmissionDAO
+from sbl_filing_api.entities.models.model_enums import FilingTaskState
 from sqlalchemy.orm import Session
 
-from sbl_filing_api.entities.models.dao import (
-    SubmissionDAO,
-    FilingDAO,
-    FilingTaskDAO,
-    FilingTaskProgressDAO,
-    FilingTaskState,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +19,11 @@ def get_filing(session: Session, lei: str, filing_period: str) -> FilingDAO:
 
 
 def query_helper(session: Session, table_obj: T, **filter_args) -> List[T]:
-    stmt = select(table_obj)
     # remove empty args
     filter_args = {k: v for k, v in filter_args.items() if v is not None}
     if filter_args:
-        stmt = stmt.filter_by(**filter_args)
-    return (session.scalars(stmt)).all()
+        return session.query(table_obj).filter_by(**filter_args).all()
+    return session.query(table_obj).all()
 
 
 def populate_missing_tasks(session: Session, filings: List[FilingDAO]):

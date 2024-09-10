@@ -3,7 +3,7 @@ import logging
 from concurrent.futures import ProcessPoolExecutor
 from http import HTTPStatus
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, Response, status
 from regtech_api_commons.api.exceptions import RegTechHttpException
 from regtech_api_commons.api.router_wrapper import Router
 from typing import Annotated
@@ -41,8 +41,8 @@ def delete_filing(request: Request, lei: str, period_code: str):
             except Exception as e:
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                    name="S3 Bucket Delete Failed",
-                    detail="Failed to delete data from s3",
+                    name="Contact Info Delete Failed",
+                    detail="Failed to delete contact info",
                 ) from e
 
             try:
@@ -91,3 +91,4 @@ def delete_filing(request: Request, lei: str, period_code: str):
             name="Invalid LEI",
             detail="Not a valid LEI",
         )
+    return Response(status_code=status.HTTP_202_ACCEPTED)
