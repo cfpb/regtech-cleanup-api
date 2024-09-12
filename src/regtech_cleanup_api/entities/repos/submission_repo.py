@@ -1,7 +1,12 @@
 import logging
 from typing import List, TypeVar
 from copy import deepcopy
-from sbl_filing_api.entities.models.dao import FilingDAO, FilingTaskProgressDAO, FilingTaskDAO, SubmissionDAO
+from sbl_filing_api.entities.models.dao import (
+    FilingDAO,
+    FilingTaskProgressDAO,
+    FilingTaskDAO,
+    SubmissionDAO,
+)
 from sbl_filing_api.entities.models.model_enums import FilingTaskState
 from sqlalchemy.orm import Session
 
