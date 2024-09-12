@@ -13,8 +13,6 @@ T = TypeVar("T")
 
 def get_filing(session: Session, lei: str, filing_period: str) -> FilingDAO:
     result = query_helper(session, FilingDAO, lei=lei, filing_period=filing_period)
-    if result:
-        result = populate_missing_tasks(session, result)
     return result[0] if result else None
 
 
@@ -24,30 +22,6 @@ def query_helper(session: Session, table_obj: T, **filter_args) -> List[T]:
     if filter_args:
         return session.query(table_obj).filter_by(**filter_args).all()
     return session.query(table_obj).all()
-
-
-def populate_missing_tasks(session: Session, filings: List[FilingDAO]):
-    filing_tasks = get_filing_tasks(session)
-    filings_copy = deepcopy(filings)
-    for f in filings_copy:
-        tasks = [t.task.name for t in f.tasks]
-        missing_tasks = [t for t in filing_tasks if t.name not in tasks]
-        for mt in missing_tasks:
-            f.tasks.append(
-                FilingTaskProgressDAO(
-                    filing=f.id,
-                    task_name=mt.name,
-                    task=mt,
-                    state=FilingTaskState.NOT_STARTED,
-                    user="",
-                )
-            )
-
-    return filings_copy
-
-
-def get_filing_tasks(session: Session) -> List[FilingTaskDAO]:
-    return query_helper(session, FilingTaskDAO)
 
 
 def get_submissions(
