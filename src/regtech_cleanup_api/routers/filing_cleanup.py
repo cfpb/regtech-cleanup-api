@@ -3,7 +3,7 @@ import logging
 from concurrent.futures import ProcessPoolExecutor
 from http import HTTPStatus
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, Response, status
 from regtech_api_commons.api.exceptions import RegTechHttpException
 from regtech_api_commons.api.router_wrapper import Router
 from typing import Annotated
@@ -21,7 +21,7 @@ from regtech_cleanup_api.services.validation import is_valid_cleanup_lei
 logger = logging.getLogger(__name__)
 
 
-async def set_db(
+def set_db(
     request: Request, session: Annotated[Session, Depends(get_filing_session)]
 ):
     request.state.db_session = session
@@ -32,23 +32,21 @@ router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)
 
 
 @router.delete("/institutions/{lei}/filings/{period_code}")
-async def delete_filing(request: Request, lei: str, period_code: str):
+def delete_filing(request: Request, lei: str, period_code: str):
     if is_valid_cleanup_lei(lei):
         try:
             session = request.state.db_session
             try:
-                await repo.delete_contact_info(session, lei, period_code)
+                repo.delete_contact_info(session, lei, period_code)
             except Exception as e:
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                    name="S3 Bucket Delete Failed",
-                    detail="Failed to delete data from s3",
+                    name="Contact Info Delete Failed",
+                    detail="Failed to delete contact info",
                 ) from e
 
             try:
-                user_action_ids = await repo.get_user_action_ids(
-                    session, lei, period_code
-                )
+                user_action_ids = repo.get_user_action_ids(session, lei, period_code)
             except Exception as e:
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -57,7 +55,7 @@ async def delete_filing(request: Request, lei: str, period_code: str):
                 ) from e
 
             try:
-                await repo.delete_submissions(session, lei, period_code)
+                repo.delete_submissions(session, lei, period_code)
             except Exception as e:
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -66,7 +64,7 @@ async def delete_filing(request: Request, lei: str, period_code: str):
                 ) from e
 
             try:
-                await repo.delete_filing(session, lei, period_code)
+                repo.delete_filing(session, lei, period_code)
             except Exception as e:
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -75,7 +73,7 @@ async def delete_filing(request: Request, lei: str, period_code: str):
                 ) from e
 
             try:
-                await repo.delete_user_actions(session, user_action_ids)
+                repo.delete_user_actions(session, user_action_ids)
             except Exception as e:
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -93,3 +91,4 @@ async def delete_filing(request: Request, lei: str, period_code: str):
             name="Invalid LEI",
             detail="Not a valid LEI",
         )
+    return Response(status_code=status.HTTP_202_ACCEPTED)
