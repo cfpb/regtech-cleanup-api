@@ -26,7 +26,7 @@ def get_user_action_ids(
     if not submissions:
         filing = submission_repo.get_filing(session, lei, period_code)
         filing_user_action_id = (
-            [filing.creator_id] if filing.creator_id is not None else []
+            [filing.creator_id] if filing.creator_id else []
         )
     submissions = submission_repo.get_submissions(session, lei, period_code)
     user_action_ids = list(
