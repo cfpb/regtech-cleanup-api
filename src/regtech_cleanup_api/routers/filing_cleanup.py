@@ -123,6 +123,9 @@ def delete_submissions(request: Request, lei: str, period_code: str):
                     name="User Action Delete Failed",
                     detail="Failed to delete user action data",
                 ) from e
+
+            delete_from_storage(period_code, lei)
+
         except Exception as e:
             raise e
     else:

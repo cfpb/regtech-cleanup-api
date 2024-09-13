@@ -23,10 +23,13 @@ def delete(path: str):
             object_keys = {
                 "Objects": [{"Key": k["Key"]} for k in s3_objects["Contents"]]
             }
-            s3.meta.client.delete_objects(Bucket=bucket, Delete=object_keys)
+            try:
+                s3.meta.client.delete_objects(Bucket=bucket, Delete=object_keys)
+            except Exception as e:
+                raise RegTechHttpException(
+                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    name="Failed to delete s3 data",
+                    detail="Failed to delete s3 data",
+                ) from e
         else:
-            raise RegTechHttpException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                name="Content Not Available",
-                detail="Associated LEI data is not present for removal",
-            )
+            logging.error("Associated LEI data is not present for removal")
