@@ -11,5 +11,5 @@ def delete_from_storage(period_code: str, lei: str) -> None:
         raise RegTechHttpException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             name="Delete Failure",
-            detail="Failed to delete file",
+            detail=f"Failed to delete file(s) for LEI {lei}",
         ) from e

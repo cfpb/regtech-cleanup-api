@@ -16,16 +16,24 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 
-def get_user_action_ids(session: Session, lei: str = None, period_code: str = None):
-    filing = submission_repo.get_filing(session, lei, period_code)
+def get_user_action_ids(
+    session: Session,
+    lei: str = None,
+    period_code: str = None,
+    just_submissions: bool = False,
+):
+    filing_user_action_id = []
+    if not just_submissions:
+        filing = submission_repo.get_filing(session, lei, period_code)
+        filing_user_action_id = (
+            [filing.creator_id] if filing.creator_id else []
+        )
     submissions = submission_repo.get_submissions(session, lei, period_code)
     user_action_ids = list(
         set(
             [s.submitter_id for s in submissions if s.submitter_id is not None]
             + [a.accepter_id for a in submissions if a.accepter_id is not None]
-            + [filing.creator_id]
-            if filing.creator_id is not None
-            else []
+            + filing_user_action_id
         )
     )
     return user_action_ids
