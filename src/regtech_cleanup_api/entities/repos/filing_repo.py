@@ -20,10 +20,10 @@ def get_user_action_ids(
     session: Session,
     lei: str = None,
     period_code: str = None,
-    submissions: bool = False,
+    just_submissions: bool = False,
 ):
     filing_user_action_id = []
-    if not submissions:
+    if not just_submissions:
         filing = submission_repo.get_filing(session, lei, period_code)
         filing_user_action_id = (
             [filing.creator_id] if filing.creator_id else []
