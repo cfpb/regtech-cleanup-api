@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 
+def get_filings(session: Session, lei: str) -> List[FilingDAO]:
+    return query_helper(session, FilingDAO, lei=lei)
+
+
 def get_filing(session: Session, lei: str, filing_period: str) -> FilingDAO:
     result = query_helper(session, FilingDAO, lei=lei, filing_period=filing_period)
     return result[0] if result else None
@@ -25,9 +29,7 @@ def query_helper(session: Session, table_obj: T, **filter_args) -> List[T]:
     return session.query(table_obj).all()
 
 
-def get_submissions(
-    session: Session, lei: str = None, filing_period: str = None
-) -> List[SubmissionDAO]:
+def get_submissions(session: Session, lei: str = None, filing_period: str = None) -> List[SubmissionDAO]:
     filing_id = None
     if lei and filing_period:
         filing = get_filing(session, lei=lei, filing_period=filing_period)

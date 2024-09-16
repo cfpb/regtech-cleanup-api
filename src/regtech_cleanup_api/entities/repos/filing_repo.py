@@ -25,9 +25,7 @@ def get_user_action_ids(
     filing_user_action_id = []
     if not just_submissions:
         filing = submission_repo.get_filing(session, lei, period_code)
-        filing_user_action_id = (
-            [filing.creator_id] if filing.creator_id else []
-        )
+        filing_user_action_id = [filing.creator_id] if filing.creator_id else []
     submissions = submission_repo.get_submissions(session, lei, period_code)
     user_action_ids = list(
         set(
@@ -82,7 +80,5 @@ def delete_contact_info(session: Session, lei: str = None, period_code: str = No
 
 
 def delete_helper(session: Session, table_obj: T, table_id: Any):
-    session.query(table_obj).filter(table_obj.id == table_id).delete(
-        synchronize_session="fetch"
-    )
+    session.query(table_obj).filter(table_obj.id == table_id).delete(synchronize_session="fetch")
     session.commit()

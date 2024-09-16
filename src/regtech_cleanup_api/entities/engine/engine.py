@@ -54,9 +54,7 @@ user_fi_engine = create_engine(
     echo=institution_settings.db_logging,
     poolclass=NullPool,
 ).execution_options(schema_translate_map={None: institution_settings.inst_db_schema})
-InstitutionSessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=user_fi_engine
-)
+InstitutionSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=user_fi_engine)
 
 
 filing_engine = create_engine(
