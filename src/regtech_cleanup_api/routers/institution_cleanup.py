@@ -31,7 +31,7 @@ router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)
 
 
 @router.delete(
-    "/{lei}",
+    "/institution/{lei}",
     response_model=FinancialInstitutionWithRelationsDto,
     dependencies=[Depends(verify_user_lei_relation)],
 )
@@ -43,29 +43,33 @@ def delete_institution(request: Request, lei: str):
             detail=f"{lei} not valid test lei.",
         )
     else:
-        delete_domains = repo.delete_domains_by_lei(request.state.db_session, lei)
-        if not delete_domains:
-            logger.error(f"Domain(s) for LEI {lei} not deleted.")
+        return delete_helper(lei, request.state.db_session)
 
-        delete_sbl_type = repo.delete_sbl_type_by_lei(request.state.db_session, lei)
-        if not delete_sbl_type:
-            logger.error(f"sbl type(s) for LEI {lei} not deleted.")
 
-        res = repo.delete_institution(request.state.db_session, lei)
-        if not res:
+def delete_helper(lei: str, session: Session):
+    delete_domains = repo.delete_domains_by_lei(session, lei)
+    if not delete_domains:
+        logger.error(f"Domain(s) for LEI {lei} not deleted.")
+
+    delete_sbl_type = repo.delete_sbl_type_by_lei(session, lei)
+    if not delete_sbl_type:
+        logger.error(f"sbl type(s) for LEI {lei} not deleted.")
+
+    res = repo.delete_institution(session, lei)
+    if not res:
+        raise RegTechHttpException(
+            HTTPStatus.NOT_FOUND,
+            name="Institution to be deleted Not Found",
+            detail=f"{lei} not found.",
+        )
+    else:
+        try:
+            oauth2_admin.delete_group(lei)
+        except Exception:
             raise RegTechHttpException(
                 HTTPStatus.NOT_FOUND,
-                name="Institution to be deleted Not Found",
-                detail=f"{lei} not found.",
+                name="Group Not Found",
+                detail=f"The group to be deleted {lei} not found.",
             )
-        else:
-            try:
-                oauth2_admin.delete_group(lei)
-            except Exception:
-                raise RegTechHttpException(
-                    HTTPStatus.NOT_FOUND,
-                    name="Group Not Found",
-                    detail=f"The group to be deleted {lei} not found.",
-                )
 
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
