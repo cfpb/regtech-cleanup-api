@@ -43,7 +43,11 @@ def delete_filing(request: Request, lei: str, period_code: str):
             delete_helper(lei, period_code, session)
 
         except Exception as e:
-            raise e
+            raise RegTechHttpException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                name="Delete Filing Server Error",
+                detail=f"Server error while trying to delete filing for LEI {lei}.",
+            ) from e
 
 
 def delete_helper(lei: str, period_code: str, session: Session):
