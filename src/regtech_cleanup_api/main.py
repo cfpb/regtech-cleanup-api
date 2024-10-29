@@ -19,6 +19,7 @@ from regtech_api_commons.api.exception_handlers import (
 import uvicorn
 
 from regtech_cleanup_api.routers.filing_cleanup import router as filing_cleanup
+from regtech_cleanup_api.routers.institution_cleanup import router as institution_cleanup
 from regtech_cleanup_api.routers.cleanup import router as cleanup_router
 from regtech_cleanup_api.config import kc_settings
 
@@ -52,6 +53,7 @@ app.add_middleware(
 
 app.include_router(cleanup_router, prefix="/v1/cleanup")
 app.include_router(filing_cleanup, prefix="/v1/cleanup/filing")
+app.include_router(institution_cleanup, prefix="/v1/cleanup/institution")
 
 
 if __name__ == "__main__":

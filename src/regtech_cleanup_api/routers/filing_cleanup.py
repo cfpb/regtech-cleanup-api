@@ -106,7 +106,9 @@ def delete_submissions(request: Request, lei: str, period_code: str):
         try:
             session = request.state.db_session
             try:
-                user_action_ids = repo.get_user_action_ids(session, lei=lei, period_code=period_code, just_submissions=True)
+                user_action_ids = repo.get_user_action_ids(
+                    session, lei=lei, period_code=period_code, just_submissions=True
+                )
             except Exception as e:
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,

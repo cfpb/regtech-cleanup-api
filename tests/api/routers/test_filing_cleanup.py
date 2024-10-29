@@ -1,5 +1,4 @@
 import json
-from http import HTTPStatus
 from unittest.mock import Mock, ANY
 
 import pytest
@@ -32,7 +31,7 @@ def test_delete_filing(app_fixture: FastAPI, mocker: MockerFixture, authed_user_
     assert json.loads(res.text)["error_name"] == "Delete Filing Server Error"
 
 
-def test_delete_helper(app_fixture: FastAPI, mocker: MockerFixture):
+def test_filing_delete_helper(app_fixture: FastAPI, mocker: MockerFixture):
     session_mock = Mock()
     delete_contact_info_mock = mocker.patch("regtech_cleanup_api.routers.filing_cleanup.repo.delete_contact_info")
     delete_contact_info_mock.return_value = None
