@@ -213,7 +213,7 @@ class TestFilingRepo:
     def test_delete_filing(self, transaction_session: Session, query_session: Session):
         repo.delete_filing(transaction_session, "1234567890", "2024")
         res = query_session.query(FilingDAO).all()
-        res_leis = [l.lei for l in res]
+        res_leis = [fd.lei for fd in res]
         assert "1234567890" not in res_leis
         assert "ABCDEFGHIJ" in res_leis
         assert "ZYXWVUTSRQP" in res_leis

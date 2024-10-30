@@ -1,5 +1,7 @@
 import pytest
-from sbl_filing_api.entities.models.dao import Base
+from sbl_filing_api.entities.models.dao import Base as Filing_Base
+from regtech_user_fi_management.entities.models.dao import Base as Institution_Base
+from tests.entities.test_dao import Base as Test_Base
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -10,11 +12,31 @@ def engine():
 
 
 @pytest.fixture(scope="function", autouse=True)
-def setup_db(request: pytest.FixtureRequest, engine: Engine):
-    Base.metadata.create_all(bind=engine)
+def setup_filing_db(request: pytest.FixtureRequest, engine: Engine):
+    Filing_Base.metadata.create_all(bind=engine)
 
     def teardown():
-        Base.metadata.drop_all(bind=engine)
+        Filing_Base.metadata.drop_all(bind=engine)
+
+    request.addfinalizer(teardown)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def setup_institution_db(request: pytest.FixtureRequest, engine: Engine):
+    Institution_Base.metadata.create_all(bind=engine)
+
+    def teardown():
+        Institution_Base.metadata.drop_all(bind=engine)
+
+    request.addfinalizer(teardown)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def setup_test_db(request: pytest.FixtureRequest, engine: Engine):
+    Test_Base.metadata.create_all(bind=engine)
+
+    def teardown():
+        Test_Base.metadata.drop_all(bind=engine)
 
     request.addfinalizer(teardown)
 
