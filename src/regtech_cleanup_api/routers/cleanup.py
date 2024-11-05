@@ -54,8 +54,8 @@ def delete_all_things(request: Request, lei: str):
     if not is_valid_cleanup_lei(lei):
         raise RegTechHttpException(
             HTTPStatus.NOT_ACCEPTABLE,
-            name="Not Test LEI",
-            detail=f"{lei} not valid test lei.",
+            name="Invalid LEI",
+            detail=f"Not a valid LEI {lei}",
         )
     else:
         institution_delete_helper(lei, request.state.institution_db_session)

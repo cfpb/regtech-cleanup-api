@@ -17,4 +17,4 @@ def test_delete_failure(mocker: MockerFixture):
     with pytest.raises(Exception) as e:
         cleanup_processor.delete_from_storage("test_period", "test")
     assert isinstance(e.value, RegTechHttpException)
-    assert e.value.name == "Delete Failure"
+    assert e.value.name == "File Delete Failure"
