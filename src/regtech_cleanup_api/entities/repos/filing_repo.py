@@ -1,5 +1,5 @@
 import logging
-from typing import TypeVar
+from typing import TypeVar, Any
 from sbl_filing_api.entities.models.dao import (
     UserActionDAO,
     FilingDAO,
@@ -10,7 +10,6 @@ from sbl_filing_api.entities.models.dao import (
 from sqlalchemy.orm import Session
 
 from regtech_cleanup_api.entities.repos import submission_repo
-from regtech_cleanup_api.entities.repos import repo_utils
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +44,7 @@ def get_contact_info(session: Session, lei: str = None, period_code: str = None)
 
 
 def delete_user_action(session: Session, user_action_id: int):
-    repo_utils.delete_helper(session, UserActionDAO, user_action_id)
+    delete_helper(session, UserActionDAO, user_action_id)
 
 
 def delete_user_actions(session: Session, user_action_ids):
@@ -55,13 +54,13 @@ def delete_user_actions(session: Session, user_action_ids):
 def delete_filing(session: Session, lei: str = None, period_code: str = None):
     filing = submission_repo.get_filing(session, lei, period_code)
     if filing:
-        repo_utils.delete_helper(session, FilingDAO, filing.id)
+        delete_helper(session, FilingDAO, filing.id)
     else:
         logger.info(f"No filing data to be deleted for LEI {lei}")
 
 
 def delete_submission(session: Session, submission_id: int):
-    repo_utils.delete_helper(session, SubmissionDAO, submission_id)
+    delete_helper(session, SubmissionDAO, submission_id)
 
 
 def delete_submissions(session: Session, lei: str = None, period_code: str = None):
@@ -75,6 +74,11 @@ def delete_submissions(session: Session, lei: str = None, period_code: str = Non
 def delete_contact_info(session: Session, lei: str = None, period_code: str = None):
     contact_info = get_contact_info(session, lei, period_code)
     if contact_info:
-        repo_utils.delete_helper(session, ContactInfoDAO, contact_info.id)
+        delete_helper(session, ContactInfoDAO, contact_info.id)
     else:
         logger.info(f"No contact info to be deleted for LEI {lei}")
+
+
+def delete_helper(session: Session, table_obj: T, table_id: Any):
+    session.query(table_obj).filter(table_obj.id == table_id).delete(synchronize_session="fetch")
+    session.commit()
