@@ -31,7 +31,7 @@ router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)
 
 
 @router.delete(
-    "/institution/{lei}",
+    "/{lei}",
     response_model=FinancialInstitutionWithRelationsDto,
     dependencies=[Depends(verify_user_lei_relation)],
 )

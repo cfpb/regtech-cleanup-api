@@ -29,7 +29,7 @@ executor = ProcessPoolExecutor()
 router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)])
 
 
-@router.delete("/filing/{lei}/{period_code}")
+@router.delete("/{lei}/{period_code}")
 def delete_filing(request: Request, lei: str, period_code: str):
     if not is_valid_cleanup_lei(lei):
         raise RegTechHttpException(
@@ -48,6 +48,7 @@ def delete_filing(request: Request, lei: str, period_code: str):
                 name="Delete Filing Server Error",
                 detail=f"Server error while trying to delete filing for LEI {lei}.",
             ) from e
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 def delete_helper(lei: str, period_code: str, session: Session):
@@ -98,8 +99,6 @@ def delete_helper(lei: str, period_code: str, session: Session):
 
     delete_from_storage(period_code, lei)
 
-    return Response(status_code=status.HTTP_202_ACCEPTED)
-
 
 @router.delete("/submissions/{lei}/{period_code}")
 def delete_submissions(request: Request, lei: str, period_code: str):
@@ -107,7 +106,9 @@ def delete_submissions(request: Request, lei: str, period_code: str):
         try:
             session = request.state.db_session
             try:
-                user_action_ids = repo.get_user_action_ids(session, lei=lei, period_code=period_code, submissions=True)
+                user_action_ids = repo.get_user_action_ids(
+                    session, lei=lei, period_code=period_code, just_submissions=True
+                )
             except Exception as e:
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -141,4 +142,4 @@ def delete_submissions(request: Request, lei: str, period_code: str):
             name="Invalid LEI",
             detail="Not a valid LEI",
         )
-    return Response(status_code=status.HTTP_202_ACCEPTED)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
