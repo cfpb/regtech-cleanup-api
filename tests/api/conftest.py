@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from regtech_api_commons.models.auth import AuthenticatedUser
 from sbl_filing_api.entities.models.dao import FilingDAO, ContactInfoDAO, UserActionDAO
 from sbl_filing_api.entities.models.model_enums import UserActionType
-from starlette.authentication import AuthCredentials, UnauthenticatedUser
+from starlette.authentication import AuthCredentials
 
 
 @pytest.fixture
@@ -35,12 +35,6 @@ def authed_user_mock(auth_mock: Mock) -> Mock:
         AuthCredentials(["manage-account", "query-groups", "manage-users", "authenticated"]),
         AuthenticatedUser.from_claim(claims),
     )
-    return auth_mock
-
-
-@pytest.fixture
-def unauthed_user_mock(auth_mock: Mock) -> Mock:
-    auth_mock.return_value = (AuthCredentials("unauthenticated"), UnauthenticatedUser())
     return auth_mock
 
 
