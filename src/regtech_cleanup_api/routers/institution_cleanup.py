@@ -47,14 +47,13 @@ def delete_institution(request: Request, lei: str):
 
 
 def delete_helper(lei: str, session: Session):
-
     try:
         repo.delete_domains_by_lei(session, lei)
     except Exception as e:
         raise RegTechHttpException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             name="Domains Delete Failed",
-            detail="Failed to delete domains",
+            detail=f"Failed to delete domains for LEI {lei}",
         ) from e
 
     try:
@@ -63,7 +62,7 @@ def delete_helper(lei: str, session: Session):
         raise RegTechHttpException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             name="Sbl Type Delete Failed",
-            detail="Failed to delete sbl_types",
+            detail=f"Failed to delete sbl_types for LEI {lei}",
         ) from e
 
     res = repo.delete_institution(session, lei)
