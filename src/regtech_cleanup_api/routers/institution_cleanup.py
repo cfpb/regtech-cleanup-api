@@ -39,8 +39,8 @@ def delete_institution(request: Request, lei: str):
     if not is_valid_cleanup_lei(lei):
         raise RegTechHttpException(
             HTTPStatus.NOT_ACCEPTABLE,
-            name="Not Test LEI",
-            detail=f"{lei} not valid test lei.",
+            name="Invalid LEI",
+            detail=f"Not a valid LEI {lei}",
         )
     else:
         return delete_helper(lei, request.state.db_session)
@@ -70,8 +70,8 @@ def delete_helper(lei: str, session: Session):
     if not res:
         raise RegTechHttpException(
             HTTPStatus.NOT_FOUND,
-            name="Institution to be deleted Not Found",
-            detail=f"{lei} not found.",
+            name="Institution Delete Failed",
+            detail=f"Institution LEI {lei} not found.",
         )
     else:
         try:
@@ -79,8 +79,8 @@ def delete_helper(lei: str, session: Session):
         except Exception:
             raise RegTechHttpException(
                 HTTPStatus.NOT_FOUND,
-                name="Group Not Found",
-                detail=f"The group to be deleted {lei} not found.",
+                name="Group Delete Failed",
+                detail=f"The group associated with LEI {lei} not found.",
             )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

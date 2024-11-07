@@ -35,7 +35,7 @@ def delete_filing(request: Request, lei: str, period_code: str):
         raise RegTechHttpException(
             status_code=HTTPStatus.NOT_ACCEPTABLE,
             name="Invalid LEI",
-            detail="Not a valid LEI",
+            detail=f"Not a valid LEI {lei}",
         )
     else:
         try:
@@ -58,7 +58,7 @@ def delete_helper(lei: str, period_code: str, session: Session):
         raise RegTechHttpException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             name="Contact Info Delete Failed",
-            detail="Failed to delete contact info",
+            detail=f"Failed to delete contact info for LEI {lei}",
         ) from e
 
     try:
@@ -67,7 +67,7 @@ def delete_helper(lei: str, period_code: str, session: Session):
         raise RegTechHttpException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             name="Missing User Action Data",
-            detail="Failed to get user action data",
+            detail=f"Failed to get user action data for LEI {lei}",
         ) from e
 
     try:
@@ -76,7 +76,7 @@ def delete_helper(lei: str, period_code: str, session: Session):
         raise RegTechHttpException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             name="Submission Delete Failed",
-            detail="Failed to delete submission data",
+            detail=f"Failed to delete submission data for LEI {lei}",
         ) from e
 
     try:
@@ -85,7 +85,7 @@ def delete_helper(lei: str, period_code: str, session: Session):
         raise RegTechHttpException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             name="Filing Delete Failed",
-            detail="Failed to delete filing data",
+            detail=f"Failed to delete filing data for LEI {lei}",
         ) from e
 
     try:
@@ -94,7 +94,7 @@ def delete_helper(lei: str, period_code: str, session: Session):
         raise RegTechHttpException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             name="User Action Delete Failed",
-            detail="Failed to delete user action data",
+            detail=f"Failed to delete user action data for LEI {lei}",
         ) from e
 
     delete_from_storage(period_code, lei)
@@ -113,7 +113,7 @@ def delete_submissions(request: Request, lei: str, period_code: str):
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                     name="Missing User Action Data",
-                    detail="Failed to get user action data",
+                    detail=f"Failed to get user action data for LEI {lei}",
                 ) from e
             try:
                 repo.delete_submissions(session, lei, period_code)
@@ -121,7 +121,7 @@ def delete_submissions(request: Request, lei: str, period_code: str):
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                     name="Submission Delete Failed",
-                    detail="Failed to delete submission data",
+                    detail=f"Failed to delete submission data for LEI {lei}",
                 ) from e
             try:
                 repo.delete_user_actions(session, user_action_ids)
@@ -129,7 +129,7 @@ def delete_submissions(request: Request, lei: str, period_code: str):
                 raise RegTechHttpException(
                     status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                     name="User Action Delete Failed",
-                    detail="Failed to delete user action data",
+                    detail=f"Failed to delete user action data for LEI {lei}",
                 ) from e
 
             delete_from_storage(period_code, lei)
@@ -140,6 +140,6 @@ def delete_submissions(request: Request, lei: str, period_code: str):
         raise RegTechHttpException(
             status_code=HTTPStatus.NOT_ACCEPTABLE,
             name="Invalid LEI",
-            detail="Not a valid LEI",
+            detail=f"Not a valid LEI {lei}",
         )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
