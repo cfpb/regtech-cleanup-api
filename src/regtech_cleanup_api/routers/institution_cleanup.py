@@ -31,7 +31,7 @@ router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)
 
 
 @router.delete(
-    "/institution/{lei}",
+    "/{lei}",
     response_model=FinancialInstitutionWithRelationsDto,
     dependencies=[Depends(verify_user_lei_relation)],
 )
@@ -47,13 +47,24 @@ def delete_institution(request: Request, lei: str):
 
 
 def delete_helper(lei: str, session: Session):
-    delete_domains = repo.delete_domains_by_lei(session, lei)
-    if not delete_domains:
-        logger.error(f"Domain(s) for LEI {lei} not deleted.")
 
-    delete_sbl_type = repo.delete_sbl_type_by_lei(session, lei)
-    if not delete_sbl_type:
-        logger.error(f"sbl type(s) for LEI {lei} not deleted.")
+    try:
+        repo.delete_domains_by_lei(session, lei)
+    except Exception as e:
+        raise RegTechHttpException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            name="Domains Delete Failed",
+            detail="Failed to delete domains",
+        ) from e
+
+    try:
+        repo.delete_sbl_type_by_lei(session, lei)
+    except Exception as e:
+        raise RegTechHttpException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            name="Sbl Type Delete Failed",
+            detail="Failed to delete sbl_types",
+        ) from e
 
     res = repo.delete_institution(session, lei)
     if not res:
