@@ -27,13 +27,12 @@ def test_delete_institutions(app_fixture: FastAPI, mocker: MockerFixture, authed
 
 def test_institution_delete_helper(app_fixture: FastAPI, mocker: MockerFixture, caplog):
     session_mock = Mock()
-    ok_res = {"OK": True}
     delete_domains_mock = mocker.patch("regtech_cleanup_api.routers.institution_cleanup.repo.delete_domains_by_lei")
-    delete_domains_mock.return_value = ok_res
+    delete_domains_mock.return_value = None
     delete_sbl_type_mock = mocker.patch("regtech_cleanup_api.routers.institution_cleanup.repo.delete_sbl_type_by_lei")
-    delete_sbl_type_mock.return_value = ok_res
+    delete_sbl_type_mock.return_value = None
     delete_institution_mock = mocker.patch("regtech_cleanup_api.routers.institution_cleanup.repo.delete_institution")
-    delete_institution_mock.return_value = ok_res
+    delete_institution_mock.return_value = {"institution_removed": True}
     delete_group_mock = mocker.patch("regtech_cleanup_api.routers.institution_cleanup.oauth2_admin.delete_group")
     delete_group_mock.return_value = {"123456E2ETESTBANK123": "test"}
 
@@ -45,28 +44,36 @@ def test_institution_delete_helper(app_fixture: FastAPI, mocker: MockerFixture, 
     delete_group_mock.assert_called_once_with("123456E2ETESTBANK123")
 
     # Delete Domains Fail
-    delete_domains_mock.return_value = None
-    delete_helper("123456E2ETESTBANK123", session_mock)
-    assert "Domain(s) for LEI 123456E2ETESTBANK123 not deleted." in caplog.text
+    delete_domains_mock.side_effect = IOError("Test")
+    with pytest.raises(Exception) as e:
+        delete_helper("123456E2ETESTBANK123", session_mock)
+    assert isinstance(e.value, RegTechHttpException)
+    assert e.value.name == "Domains Delete Failed"
+    assert e.value.detail == "Failed to delete domains for LEI 123456E2ETESTBANK123"
 
     # Delete SBL Type Fail
-    delete_domains_mock.return_value = ok_res
-    delete_sbl_type_mock.return_value = None
-    delete_helper("123456E2ETESTBANK123", session_mock)
-    assert "sbl type(s) for LEI 123456E2ETESTBANK123 not deleted." in caplog.text
+    delete_domains_mock.side_effect = None
+    delete_sbl_type_mock.side_effect = IOError("Test")
+    with pytest.raises(Exception) as e:
+        delete_helper("123456E2ETESTBANK123", session_mock)
+    assert isinstance(e.value, RegTechHttpException)
+    assert e.value.name == "Sbl Type Delete Failed"
+    assert e.value.detail == "Failed to delete sbl_types for LEI 123456E2ETESTBANK123"
 
     # Delete Institution Fail
-    delete_sbl_type_mock.return_value = ok_res
+    delete_sbl_type_mock.side_effect = None
     delete_institution_mock.return_value = None
     with pytest.raises(Exception) as e:
         delete_helper("123456E2ETESTBANK123", session_mock)
     assert isinstance(e.value, RegTechHttpException)
-    assert e.value.name == "Institution to be deleted Not Found"
+    assert e.value.name == "Institution Delete Failed"
+    assert e.value.detail == "Institution LEI 123456E2ETESTBANK123 not found."
 
     # Delete Group Fail
-    delete_institution_mock.return_value = ok_res
+    delete_institution_mock.return_value = {"institution_removed": True}
     delete_group_mock.side_effect = IOError("test")
     with pytest.raises(Exception) as e:
         delete_helper("123456E2ETESTBANK123", session_mock)
     assert isinstance(e.value, RegTechHttpException)
-    assert e.value.name == "Group Not Found"
+    assert e.value.name == "Group Delete Failed"
+    assert e.value.detail == "The group associated with LEI 123456E2ETESTBANK123 not found."

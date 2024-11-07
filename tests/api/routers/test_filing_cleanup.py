@@ -27,8 +27,10 @@ def test_delete_filing(app_fixture: FastAPI, mocker: MockerFixture, authed_user_
     # Test with errors
     delete_helper_mock.side_effect = IOError("Test")
     res = client.delete("/v1/cleanup/filing/123456E2ETESTBANK123/2024")
+    res_text = json.loads(res.text)
     assert res.status_code == 500
-    assert json.loads(res.text)["error_name"] == "Delete Filing Server Error"
+    assert res_text["error_name"] == "Delete Filing Server Error"
+    assert res_text["error_detail"] == "Server error while trying to delete filing for LEI 123456E2ETESTBANK123."
 
 
 def test_filing_delete_helper(app_fixture: FastAPI, mocker: MockerFixture):
@@ -63,6 +65,7 @@ def test_filing_delete_helper(app_fixture: FastAPI, mocker: MockerFixture):
         delete_helper("123456E2ETESTBANK123", "2024", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "Contact Info Delete Failed"
+    assert e.value.detail == "Failed to delete contact info for LEI 123456E2ETESTBANK123"
 
     # Get User Action IDs Fail
     delete_contact_info_mock.side_effect = None
@@ -71,6 +74,7 @@ def test_filing_delete_helper(app_fixture: FastAPI, mocker: MockerFixture):
         delete_helper("123456E2ETESTBANK123", "2024", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "Missing User Action Data"
+    assert e.value.detail == "Failed to get user action data for LEI 123456E2ETESTBANK123"
 
     # Delete Submissions Fail
     user_action_ids_mock.side_effect = None
@@ -79,6 +83,7 @@ def test_filing_delete_helper(app_fixture: FastAPI, mocker: MockerFixture):
         delete_helper("123456E2ETESTBANK123", "2024", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "Submission Delete Failed"
+    assert e.value.detail == "Failed to delete submission data for LEI 123456E2ETESTBANK123"
 
     # Delete Filing Fail
     delete_submissions_mock.side_effect = None
@@ -87,6 +92,7 @@ def test_filing_delete_helper(app_fixture: FastAPI, mocker: MockerFixture):
         delete_helper("123456E2ETESTBANK123", "2024", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "Filing Delete Failed"
+    assert e.value.detail == "Failed to delete filing data for LEI 123456E2ETESTBANK123"
 
     # Delete User Actions Fail
     delete_filing_mock.side_effect = None
@@ -95,6 +101,7 @@ def test_filing_delete_helper(app_fixture: FastAPI, mocker: MockerFixture):
         delete_helper("123456E2ETESTBANK123", "2024", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "User Action Delete Failed"
+    assert e.value.detail == "Failed to delete user action data for LEI 123456E2ETESTBANK123"
 
 
 def test_unauthed_delete_submissions(app_fixture: FastAPI):
@@ -127,19 +134,25 @@ def test_delete_submissions(app_fixture: FastAPI, mocker: MockerFixture, authed_
     # Get User Action IDs fail
     user_action_ids_mock.side_effect = test_error
     res = client.delete("/v1/cleanup/filing/submissions/123456E2ETESTBANK123/2024")
+    res_text = json.loads(res.text)
     assert res.status_code == 500
-    assert json.loads(res.text)["error_name"] == "Missing User Action Data"
+    assert res_text["error_name"] == "Missing User Action Data"
+    assert res_text["error_detail"] == "Failed to get user action data for LEI 123456E2ETESTBANK123"
 
     # Delete Submissions Fail
     user_action_ids_mock.side_effect = None
     delete_submissions_mock.side_effect = test_error
     res = client.delete("/v1/cleanup/filing/submissions/123456E2ETESTBANK123/2024")
+    res_text = json.loads(res.text)
     assert res.status_code == 500
-    assert json.loads(res.text)["error_name"] == "Submission Delete Failed"
+    assert res_text["error_name"] == "Submission Delete Failed"
+    assert res_text["error_detail"] == "Failed to delete submission data for LEI 123456E2ETESTBANK123"
 
     # Delete User Actions Fail
     delete_submissions_mock.side_effect = None
     delete_user_actions_mock.side_effect = test_error
     res = client.delete("/v1/cleanup/filing/submissions/123456E2ETESTBANK123/2024")
+    res_text = json.loads(res.text)
     assert res.status_code == 500
-    assert json.loads(res.text)["error_name"] == "User Action Delete Failed"
+    assert res_text["error_name"] == "User Action Delete Failed"
+    assert res_text["error_detail"] == "Failed to delete user action data for LEI 123456E2ETESTBANK123"
