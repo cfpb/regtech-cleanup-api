@@ -30,7 +30,7 @@ def delete_sbl_type_by_lei(session: Session, lei: str) -> List[SblTypeMappingDao
         logger.warning(f"No Domain(s) for LEI {lei} found.")
 
 
-def delete_institution(session: Session, lei: str) -> FinancialInstitutionDao | None:
+def delete_institution(session: Session, lei: str) -> dict[str, bool] | None:
     stmt = session.query(FinancialInstitutionDao).filter(FinancialInstitutionDao.lei == lei)
     fi = session.execute(stmt)
 
@@ -40,5 +40,6 @@ def delete_institution(session: Session, lei: str) -> FinancialInstitutionDao | 
         del_hist_stmt = text("DELETE from financial_institutions_history where lei = :lei")
         session.execute(del_hist_stmt, {"lei": lei})
         session.commit()
+        return {"institution_removed": True}
     else:
         logger.warning(f"No sbl type(s) for LEI {lei} found.")
