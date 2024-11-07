@@ -49,6 +49,7 @@ def test_institution_delete_helper(app_fixture: FastAPI, mocker: MockerFixture, 
         delete_helper("123456E2ETESTBANK123", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "Domains Delete Failed"
+    assert e.value.detail == "Failed to delete domains for LEI 123456E2ETESTBANK123"
 
     # Delete SBL Type Fail
     delete_domains_mock.side_effect = None
@@ -57,6 +58,7 @@ def test_institution_delete_helper(app_fixture: FastAPI, mocker: MockerFixture, 
         delete_helper("123456E2ETESTBANK123", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "Sbl Type Delete Failed"
+    assert e.value.detail == "Failed to delete sbl_types for LEI 123456E2ETESTBANK123"
 
     # Delete Institution Fail
     delete_sbl_type_mock.side_effect = None
@@ -65,6 +67,7 @@ def test_institution_delete_helper(app_fixture: FastAPI, mocker: MockerFixture, 
         delete_helper("123456E2ETESTBANK123", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "Institution Delete Failed"
+    assert e.value.detail == "Institution LEI 123456E2ETESTBANK123 not found."
 
     # Delete Group Fail
     delete_institution_mock.return_value = {"institution_removed": True}
@@ -73,3 +76,4 @@ def test_institution_delete_helper(app_fixture: FastAPI, mocker: MockerFixture, 
         delete_helper("123456E2ETESTBANK123", session_mock)
     assert isinstance(e.value, RegTechHttpException)
     assert e.value.name == "Group Delete Failed"
+    assert e.value.detail == "The group associated with LEI 123456E2ETESTBANK123 not found."
