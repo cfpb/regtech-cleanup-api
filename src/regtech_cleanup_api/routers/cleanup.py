@@ -7,6 +7,7 @@ from fastapi import Depends, Request, Response, status
 from regtech_api_commons.api.exceptions import RegTechHttpException
 from regtech_api_commons.api.router_wrapper import Router
 from typing import Annotated
+from starlette.authentication import requires
 
 from regtech_cleanup_api.entities.engine.engine import (
     get_filing_session,
@@ -50,6 +51,7 @@ router = Router(
 
 
 @router.delete("/{lei}")
+@requires("authenticated")
 def delete_all_things(request: Request, lei: str):
     if not is_valid_cleanup_lei(lei):
         raise RegTechHttpException(
