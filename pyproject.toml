@@ -44,6 +44,19 @@ source = ["src"]
 [tool.coverage.report]
 skip_empty = true
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["src"]
+addopts = [
+  "--cov-report=term-missing",
+  "--cov-branch",
+  "--cov-report=xml",
+  "--cov-report=term",
+  "--cov=src",
+  "-vv",
+  "--strict-markers",
+  "-rfE",
+]
 env = [
   "AUTH_CLIENT=regtech-client",
   "AUTH_URL=http://localhost",
@@ -70,3 +83,6 @@ env = [
   "KC_URL=http://localhost:8880",
   "TOKEN_URL=http://localhost"
 ]
+
+testpaths = ["tests"]
+
