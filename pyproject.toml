@@ -26,6 +26,8 @@ line-length = 120
 pytest = "^8.3.2"
 pytest-cov = "^5.0.0"
 pytest-mock = "^3.14"
+pytest-env = "^1.1.5"
+
 
 [tool.poetry.group.linters.dependencies]
 ruff = "0.5.5"
