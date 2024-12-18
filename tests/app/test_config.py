@@ -10,14 +10,14 @@ def test_filing_postgres_dsn_building():
         "db_scehma": "test",
     }
     settings = Filing_Settings(**mock_config)
-    assert str(settings.conn) == "postgresql://user:%5Cz9-%2Ftgb76%23%40@test:5432/test"
+    assert str(settings.conn) == "postgresql+asyncpg://user:%5Cz9-%2Ftgb76%23%40@test:5432/test"
 
 
 def test_default_maxes():
     settings = Filing_Settings()
     assert settings.max_validation_errors == 1000000
     assert settings.max_json_records == 10000
-    assert settings.max_json_group_size == 0
+    assert settings.max_json_group_size == 200
 
 
 def test_default_server_configs():

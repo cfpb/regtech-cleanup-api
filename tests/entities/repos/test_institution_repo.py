@@ -8,6 +8,7 @@ from regtech_user_fi_management.entities.models.dao import (
     FinancialInstitutionDao,
     FinancialInstitutionDomainDao,
     SblTypeMappingDao,
+    LeiStatusDao,
 )
 from regtech_cleanup_api.entities.repos import institution_repo as repo
 from sqlalchemy.orm import Session, scoped_session
@@ -58,7 +59,8 @@ class TestInstitutionsRepo:
             FinancialInstitutionDao(
                 name="Test Bank 123",
                 lei="TESTBANK123000000000",
-                is_active=True,
+                lei_status_code="ISSUED",
+                lei_status=LeiStatusDao(code="ISSUED", name="Issued", can_file=True),
                 domains=[FinancialInstitutionDomainDao(domain="test.bank.1", lei="TESTBANK123000000000")],
                 tax_id="12-3456789",
                 rssd_id=1234,
@@ -83,7 +85,8 @@ class TestInstitutionsRepo:
             FinancialInstitutionDao(
                 name="Test Bank 456",
                 lei="TESTBANK456000000000",
-                is_active=True,
+                lei_status_code="RETIRED",
+                lei_status=LeiStatusDao(code="RETIRED", name="Retired", can_file=False),
                 domains=[FinancialInstitutionDomainDao(domain="test.bank.2", lei="TESTBANK456000000000")],
                 tax_id="98-7654321",
                 rssd_id=4321,
@@ -108,7 +111,8 @@ class TestInstitutionsRepo:
             FinancialInstitutionDao(
                 name="Test Sub Bank 456",
                 lei="TESTSUBBANK456000000",
-                is_active=True,
+                lei_status_code="LAPSED",
+                lei_status=LeiStatusDao(code="LAPSED", name="Lapsed", can_file=False),
                 domains=[FinancialInstitutionDomainDao(domain="sub.test.bank.2", lei="TESTSUBBANK456000000")],
                 tax_id="76-5432198",
                 rssd_id=2134,

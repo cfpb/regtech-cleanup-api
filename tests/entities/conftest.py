@@ -1,7 +1,7 @@
 import pytest
 from sbl_filing_api.entities.models.dao import Base as Filing_Base
 from regtech_user_fi_management.entities.models.dao import Base as Institution_Base
-from tests.entities.test_dao import Base as Test_Base
+from test_dao import Base as Test_Base
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
